@@ -107,7 +107,7 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
     }
 
     // Chuyển hướng đến trang verify-successful
-    return redirect('http://localhost:3000/verify-successful');
+    return redirect(env('APP_URL_CLIENT') . '/verify-successful');
 })->name('verification.verify');
 // Route chỉ dành cho người dùng đã xác thực email
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
@@ -117,7 +117,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 });
 
 Route::get('/reset-password/{token}', function ($token) {
-    $frontendUrl = "http://localhost:3000/reset-password?token={$token}";
+    $frontendUrl = env('APP_URL_CLIENT') . "/reset-password?token={$token}";
     return redirect($frontendUrl);
 })->name('password.reset');
 Route::middleware(['auth:sanctum'])->group(function () {

@@ -47,7 +47,7 @@ Route::get('/auth/google/callback', function () {
         $user = $existingUser;
 
         // Chuyển hướng về frontend và kèm token và user
-        return redirect('http://localhost:3000' . '/?token=' . $token . '&user=' . urlencode(json_encode($user)));
+        return redirect(env('APP_URL_CLIENT') . '/?token=' . $token . '&user=' . urlencode(json_encode($user)));
     }
 
     // Nếu email chưa tồn tại, tạo người dùng mới
@@ -63,7 +63,7 @@ Route::get('/auth/google/callback', function () {
     $token = $user->createToken('user')->plainTextToken;
 
     // Chuyển hướng về frontend và kèm token và user
-    return redirect('http://localhost:3000' . '/?token=' . $token . '&user=' . urlencode(json_encode($user)));
+    return redirect(env('APP_URL_CLIENT') . '/?token=' . $token . '&user=' . urlencode(json_encode($user)));
 });
 
 
