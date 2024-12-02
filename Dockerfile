@@ -31,11 +31,14 @@ RUN a2enmod rewrite headers
 # Thiết lập thư mục làm việc
 WORKDIR /var/www/html
 
+# Copy composer files đầu tiên
+COPY composer.json composer.lock ./
+
+# Cài đặt dependencies với verbose để xem lỗi chi tiết
+RUN composer install --no-dev --optimize-autoloader --verbose
+
 # Copy toàn bộ source code
 COPY . .
-
-# Cài đặt dependencies và tối ưu
-RUN composer install --no-dev --optimize-autoloader
 
 # Thiết lập quyền
 RUN chown -R www-data:www-data /var/www/html \
