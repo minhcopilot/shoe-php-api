@@ -1,5 +1,5 @@
-# Sử dụng PHP 8.1 với Apache
-FROM php:8.1-apache
+# Sử dụng PHP 8.2 với Apache
+FROM php:8.2-apache
 
 # Cài đặt các dependencies cần thiết
 RUN apt-get update && apt-get install -y \
@@ -37,6 +37,7 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Cài đặt Composer
 COPY --from=composer:2.5.8 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Cấu hình Apache
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
