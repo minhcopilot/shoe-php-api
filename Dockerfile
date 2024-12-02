@@ -12,13 +12,31 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     nodejs \
-    npm
+    npm \
+    libicu-dev \
+    libpq-dev \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install intl
 
 # Cài đặt các PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+RUN docker-php-ext-install \
+    pdo_mysql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip \
+    opcache \
+    intl \
+    xml \
+    dom
+
+# Cấu hình PHP
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Cài đặt Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.5.8 /usr/bin/composer /usr/bin/composer
 
 # Cấu hình Apache
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -34,11 +52,15 @@ WORKDIR /var/www/html
 # Copy composer files đầu tiên
 COPY composer.json composer.lock ./
 
-# Cài đặt dependencies với verbose để xem lỗi chi tiết
-RUN composer install --no-dev --optimize-autoloader --verbose
+# Cài đặt dependencies
+RUN composer install --no-dev --no-scripts --no-autoloader --verbose
 
 # Copy toàn bộ source code
 COPY . .
+
+# Tạo autoloader và chạy scripts
+RUN composer dump-autoload --optimize \
+    && composer run-script post-autoload-dump
 
 # Thiết lập quyền
 RUN chown -R www-data:www-data /var/www/html \
