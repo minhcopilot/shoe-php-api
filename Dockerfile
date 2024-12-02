@@ -31,17 +31,11 @@ RUN a2enmod rewrite headers
 # Thiết lập thư mục làm việc
 WORKDIR /var/www/html
 
-# Copy composer files đầu tiên để tận dụng Docker cache
-COPY composer.json composer.lock ./
-
-# Cài đặt dependencies
-RUN composer install --no-scripts --no-autoloader --no-dev
-
 # Copy toàn bộ source code
 COPY . .
 
-# Tạo autoloader và tối ưu
-RUN composer dump-autoload --optimize
+# Cài đặt dependencies và tối ưu
+RUN composer install --no-dev --optimize-autoloader
 
 # Thiết lập quyền
 RUN chown -R www-data:www-data /var/www/html \
@@ -49,15 +43,12 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
 # Tạo storage link
-RUN php artisan storage:link
-
-# Tạo file .env từ .env.example nếu chưa có
-RUN cp .env.example .env
+RUN php artisan storage:link || true
 
 # Cache config và routes
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+RUN php artisan config:cache || true \
+    && php artisan route:cache || true \
+    && php artisan view:cache || true
 
 # Expose port 80
 EXPOSE 80
